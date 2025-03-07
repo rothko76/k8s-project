@@ -1,3 +1,6 @@
+import itertools
+from itertools import repeat
+
 import pika, logging, sys, argparse
 from argparse import RawTextHelpFormatter
 from time import sleep
@@ -13,11 +16,11 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--repeat', action='store', dest='repeat', help='Number of times to repeat the message', required=False, default='30')
 
     args = parser.parse_args()
-    if args.port == None:
-        print "Missing required argument: -p/--port"
+    if args.port is None:
+        print("Missing required argument: -p/--port")
         sys.exit(1)
-    if args.server == None:
-        print "Missing required argument: -s/--server"
+    if args.server is None:
+        print("Missing required argument: -s/--server")
         sys.exit(1)
 
     # sleep a few seconds to allow RabbitMQ server to come up
@@ -38,12 +41,24 @@ if __name__ == '__main__':
     # Turn on delivery confirmations
     channel.confirm_delivery()
 
-    for i in range(0, int(args.repeat)):
-        if channel.basic_publish('', q_name, args.message):
-            LOG.info('Message has been delivered')
-        else:
-            LOG.warning('Message NOT delivered')
+    if args.repeat is not None:
+        LOG.info(f'Will run {args.repeat} times ')
+        for i in range(0, int(args.repeat)):
+            if channel.basic_publish('', q_name, args.message):
+                LOG.info('Message has been delivered')
+            else:
+                LOG.warning('Message NOT delivered')
 
-        sleep(2)
+            LOG.info(f'Still {args.repeat - i} messages to go')
+            sleep(2)
+    else:
+        LOG.info(f'Will run infinitely ')
+        for i in itertools.count(start=1):
+            if channel.basic_publish('', q_name, args.message):
+                LOG.info('Message has been delivered')
+            else:
+                LOG.warning('Message NOT delivered')
+
+            sleep(20)
 
     connection.close()

@@ -38,3 +38,9 @@ docker-compose.override.yml
 *.tar
 *.img
 
+# PyCharm
+.idea/
+*.iml
+
+# VSCode
+.vscode/
