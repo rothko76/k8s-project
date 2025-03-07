@@ -1,6 +1,9 @@
 import pika, logging, sys, argparse, time
 from argparse import RawTextHelpFormatter
 from time import sleep
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 def on_message(channel, method_frame, header_frame, body):
     print(method_frame.delivery_tag)
@@ -9,6 +12,13 @@ def on_message(channel, method_frame, header_frame, body):
     LOG.info('Message has been received %s', body)
     channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
+@app.route('/metrics', methods=['GET'])
+def get_entries():
+    response = {
+        "message": "Hello, World!",
+        "status": "success"
+    }
+    return jsonify(response)
 
 if __name__ == '__main__':
     examples = sys.argv[0] + " -p 5672 -s rabbitmq "
@@ -26,6 +36,7 @@ if __name__ == '__main__':
         print("Missing required argument: -s/--server")
         sys.exit(1)
 
+    app.run(host='0.0.0.0', port=5000)
     # sleep a few seconds to allow RabbitMQ server to come up
     sleep(5)
     logging.basicConfig(level=logging.INFO)
@@ -46,3 +57,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         channel.stop_consuming()
     connection.close()
+
