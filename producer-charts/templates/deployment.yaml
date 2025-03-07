@@ -35,7 +35,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          command: ["python", "producer.py", "-p", "5672", "-s", "my-rabbitmq", "-m", "Hello", "-r", "30"]
+          command: ["python", "producer.py", "-p", "5672", "-s", "my-rabbitmq", "-m", "infinite hello"]
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
