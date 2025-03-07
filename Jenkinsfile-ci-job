@@ -1,0 +1,79 @@
+pipeline {
+    agent any  // Runs on any available agent
+    environment {
+        CONSUMER_IMAGE = 'rothko281177/consumer:latest'
+        PRODUCER_IMAGE = 'rothko281177/producer:latest'
+    }
+    
+    stages {
+        stage('Check Agent') {
+            steps {
+                sh 'hostname && whoami && uname -a'
+            }
+        }        
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/rothko76/k8s-project.git'
+            }
+        }
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    try {
+                        echo "Building Consumer Docker image..."
+                        docker.build(CONSUMER_IMAGE, './consumer')
+
+                        echo "Building Producer Docker image..."
+                        docker.build(PRODUCER_IMAGE, './producer')
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
+            }
+        }
+         stage('Push Docker Images') {
+            steps {
+                script {
+                    try {
+                        echo "Pushing Docker images..."
+
+                   // Use the Docker Pipeline plugin to push the image
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image(CONSUMER_IMAGE).push()
+                        docker.image(PRODUCER_IMAGE).push()
+                    }
+
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
+            }
+        }
+/*        stage('Deploy Application') {
+            steps {
+                script {
+                    sshagent(['deploy-server-credentials']) {  // Replace with your SSH cre ID
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_SERVER} << EOF
+                        docker pull ${DOCKER_IMAGE}:latest
+                        docker stop python-app || true
+                        docker rm python-app || true
+                        docker run -d --name python-app -p 8000:8000 ${DOCKER_IMAGE}:latest
+                        EOF
+                        """
+                    }
+                }
+            }
+        }*/
+    }
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Build or deployment failed!'
+        }
+    }
+}
