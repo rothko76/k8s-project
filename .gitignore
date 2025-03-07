@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Dependency files
+Pipfile.lock
+poetry.lock
+*.egg-info/
+dist/
+build/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Helm-specific ignores
+helm-chart/charts/
+helm-chart/tmpcharts/
+helm-chart/values.yaml.orig
+helm-chart/.helmignore
+
+# Kubernetes-related files
+.kube/
+*.kubeconfig
+
+# Docker-related
+docker-compose.override.yml
+*.tar
+*.img
+

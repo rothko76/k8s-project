@@ -1,0 +1,14 @@
+rabbitmq:
+  url: "http://rabbitmq.k8s-project:15672"  # Replace with your RabbitMQ man
+  user: "guest"
+  password: "guest"
+
+metrics:
+  enabled: true
+  include_queues: true  # Set to false if you don’t want queue metrics
+  include_vhost: false  # Enable if you want vhost metrics
+  include_exchanges: false  # Enable if you want exchange metrics
+  include_connections: true  # Enable if you want connection metrics
+  include_channels: true  # Enable if you want channel metrics
+
+

@@ -1,0 +1,27 @@
+version: '3.8'  # Use a newer version
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:  # Add a health check
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  consumer:
+    build: consumer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy  # Wait for RabbitMQ
+    command: python consumer.py -p 5672 -s rabbitmq
+
+  producer:
+    build: producer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy  # Wait for RabbitMQ
+    command: 'python producer.py -p 5672 -s rabbitmq -m "Hello" -r 30'
