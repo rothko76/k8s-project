@@ -13,6 +13,9 @@ pipeline {
         }        
         stage('Install/upgrade helm charts') {
             steps {
+                sh 'helm version'
+            }
+            steps {
                 script {
                     try {
                         echo "Deploying consumer charts"
