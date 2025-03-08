@@ -11,11 +11,11 @@ pipeline {
                 sh 'hostname && whoami && uname -a'
             }
         }        
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/rothko76/k8s-project.git'
-            }
-        }
+        // stage('Checkout') {
+        //     steps {
+        //         git 'https://github.com/rothko76/k8s-project.git'
+        //     }
+        // }
 /*        stage('Build Docker Images') {
             steps {
                 script {
