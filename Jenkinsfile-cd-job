@@ -11,20 +11,15 @@ pipeline {
                 sh 'hostname && whoami && uname -a'
             }
         }        
-        // stage('Checkout') {
-        //     steps {
-        //         git 'https://github.com/rothko76/k8s-project.git'
-        //     }
-        // }
-/*        stage('Build Docker Images') {
+        stage('Install/upgrade helm charts') {
             steps {
                 script {
                     try {
-                        echo "Building Consumer Docker image..."
-                        docker.build(CONSUMER_IMAGE, './consumer')
+                        echo "Deploying consumer charts"
+                        helm upgrade --install my-consumer-release ./consumer-charts/ --values ./consumer-charts/values.yaml
 
-                        echo "Building Producer Docker image..."
-                        docker.build(PRODUCER_IMAGE, './producer')
+                        echo "Deploying producer charts"
+                        helm upgrade --install my-producer-release ./producer-charts/ --values ./producer-charts/values.yaml
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         throw e
@@ -32,41 +27,6 @@ pipeline {
                 }
             }
         }
-         stage('Push Docker Images') {
-            steps {
-                script {
-                    try {
-                        echo "Pushing Docker images..."
-
-                   // Use the Docker Pipeline plugin to push the image
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                        docker.image(CONSUMER_IMAGE).push()
-                        docker.image(PRODUCER_IMAGE).push()
-                    }
-
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        throw e
-                    }
-                }
-            }
-        }*/
-/*        stage('Deploy Application') {
-            steps {
-                script {
-                    sshagent(['deploy-server-credentials']) {  // Replace with your SSH cre ID
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_SERVER} << EOF
-                        docker pull ${DOCKER_IMAGE}:latest
-                        docker stop python-app || true
-                        docker rm python-app || true
-                        docker run -d --name python-app -p 8000:8000 ${DOCKER_IMAGE}:latest
-                        EOF
-                        """
-                    }
-                }
-            }
-        }*/
     }
     post {
         success {
