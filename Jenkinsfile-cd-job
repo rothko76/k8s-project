@@ -25,13 +25,13 @@ pipeline {
                         echo "Deploying consumer charts"
                         sh """
                             helm upgrade --install my-consumer-release ./consumer-charts/ \\
-                            --values ./consumer-charts/values.yaml --namespace my-namespace --create-namespace
+                            --values ./consumer-charts/values.yaml --namespace k8s-project
                         """
 
                         echo "Deploying producer charts"
                         sh """
                             helm upgrade --install my-producer-release ./producer-charts/ \\
-                            --values ./producer-charts/values.yaml --namespace my-namespace --create-namespace
+                            --values ./producer-charts/values.yaml --namespace k8s-project
                         """
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
