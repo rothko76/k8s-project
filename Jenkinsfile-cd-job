@@ -16,7 +16,7 @@ pipeline {
                 git 'https://github.com/rothko76/k8s-project.git'
             }
         }
-        stage('Build Docker Images') {
+/*        stage('Build Docker Images') {
             steps {
                 script {
                     try {
@@ -50,7 +50,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 /*        stage('Deploy Application') {
             steps {
                 script {
