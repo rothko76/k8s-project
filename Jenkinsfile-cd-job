@@ -11,19 +11,28 @@ pipeline {
                 sh 'hostname && whoami && uname -a'
             }
         }        
+        
         stage('Helm version check') {
             steps {
                 sh 'helm version'
             }
-        stage('Install/upgrade helm charts') {
+        }  
+        
+        stage('Install/Upgrade Helm Charts') {
             steps {
                 script {
                     try {
                         echo "Deploying consumer charts"
-                        helm upgrade --install my-consumer-release ./consumer-charts/ --values ./consumer-charts/values.yaml
+                        sh """
+                            helm upgrade --install my-consumer-release ./consumer-charts/ \\
+                            --values ./consumer-charts/values.yaml --namespace my-namespace --create-namespace
+                        """
 
                         echo "Deploying producer charts"
-                        helm upgrade --install my-producer-release ./producer-charts/ --values ./producer-charts/values.yaml
+                        sh """
+                            helm upgrade --install my-producer-release ./producer-charts/ \\
+                            --values ./producer-charts/values.yaml --namespace my-namespace --create-namespace
+                        """
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         throw e
@@ -31,7 +40,8 @@ pipeline {
                 }
             }
         }
-    }
+    }  
+
     post {
         success {
             echo 'Deployment successful!'
