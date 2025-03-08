@@ -11,11 +11,13 @@ pipeline {
                 sh 'hostname && whoami && uname -a'
             }
         }        
-        stage('Install/upgrade helm charts') {
+        stage('Helm version check') {
             steps {
                 sh 'helm version'
             }
+        stage('Install/upgrade helm charts') {
             steps {
+                sh 'helm version'
                 script {
                     try {
                         echo "Deploying consumer charts"
